@@ -5,6 +5,16 @@
 
 $OutputEncoding = [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
 
+# Dépôt cible, indiqué explicitement (ne dépend pas du remote Git local)
+$Repo = "cheickbougoum90-web/telecom-traffic-forecasting"
+
+# Vérification : le dépôt existe et gh y a accès, sinon arrêt immédiat
+gh repo view $Repo --json nameWithOwner 2>$null | Out-Null
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Erreur : dépôt introuvable ou accès refusé. Vérifie gh auth status." -ForegroundColor Red
+    exit 1
+}
+
 # ---------- Labels ----------
 $labels = @(
     @{ n = "data";          c = "0e8a16"; d = "Données et prétraitement" },
@@ -16,7 +26,7 @@ $labels = @(
     @{ n = "documentation"; c = "c5def5"; d = "README, rapport, figures" }
 )
 foreach ($l in $labels) {
-    gh label create $l.n --color $l.c --description $l.d --force | Out-Null
+    gh label create $l.n -R $Repo --color $l.c --description $l.d --force | Out-Null
 }
 
 # ---------- Jalons ----------
@@ -29,7 +39,7 @@ $milestones = @(
     @{ t = "E5 Documentation";                d = "README FR/EN, rapport, figures, publication" }
 )
 foreach ($m in $milestones) {
-    gh api repos/:owner/:repo/milestones -f title="$($m.t)" -f description="$($m.d)" 2>$null | Out-Null
+    gh api "repos/$Repo/milestones" -f title="$($m.t)" -f description="$($m.d)" 2>$null | Out-Null
 }
 
 # ---------- Issues ----------
@@ -64,7 +74,8 @@ $issues = @(
        b = "* [ ] Résultats chiffrés et figures`n* [ ] Limites (valeurs relatives, données de 2013)`n* [ ] README.en.md synchronisé`n* [ ] Ajout au portfolio" }
 )
 foreach ($i in $issues) {
-    gh issue create --title $i.t --body $i.b --label $i.l --milestone $i.m | Out-Null
-    Write-Host "Issue créée : $($i.t)"
+    gh issue create -R $Repo --title $i.t --body $i.b --label $i.l --milestone $i.m | Out-Null
+    if ($LASTEXITCODE -eq 0) { Write-Host "Issue créée : $($i.t)" }
+    else { Write-Host "ÉCHEC : $($i.t)" -ForegroundColor Red }
 }
 Write-Host "Terminé."
