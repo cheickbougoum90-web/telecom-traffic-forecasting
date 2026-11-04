@@ -1,0 +1,22 @@
+name: telecom-ts
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12.15
+  - pandas
+  - numpy
+  - scipy
+  - matplotlib
+  - seaborn
+  - statsmodels>=0.14
+  - scikit-learn
+  - xgboost
+  - prophet
+  - pytorch
+  - fastapi
+  - uvicorn
+  - httpx
+  - joblib
+  - pytest
+  - jupyterlab
+  - ipykernel
