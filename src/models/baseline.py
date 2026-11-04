@@ -1,15 +1,10 @@
-"""Modèles de référence à battre avant ARIMA, Prophet, XGBoost et LSTM."""
+"""Modèles de référence à battre avant SARIMA, Prophet, XGBoost et LSTM."""
+import numpy as np
 import pandas as pd
 
 
-def naive_seasonal(series: pd.Series, horizon: int, season: int = 24) -> pd.Series:
-    """Prévision naïve saisonnière : répète le dernier cycle observé."""
-    last = series.iloc[-season:].to_numpy()
-    reps = -(-horizon // season)
-    values = list(last) * reps
-    idx = pd.date_range(series.index[-1] + series.index.freq, periods=horizon, freq=series.index.freq)
-    return pd.Series(values[:horizon], index=idx)
-
-
-def mae(y_true, y_pred) -> float:
-    return float((pd.Series(y_true).to_numpy() - pd.Series(y_pred).to_numpy()).__abs__().mean())
+def naive_seasonal(train: pd.Series, index: pd.DatetimeIndex, season: int = 168) -> pd.Series:
+    """Répète le dernier cycle observé : 24 pour la veille, 168 pour la semaine précédente."""
+    last = train.iloc[-season:].to_numpy()
+    values = np.resize(last, len(index))
+    return pd.Series(values, index=index, name="prediction")

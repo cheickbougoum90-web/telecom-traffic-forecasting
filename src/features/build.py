@@ -5,8 +5,8 @@ import pandas as pd
 def add_calendar_features(df: pd.DataFrame) -> pd.DataFrame:
     out = df.copy()
     out["hour"] = out.index.hour
-    out["dayofweek"] = out.index.dayofweek
-    out["is_weekend"] = (out.index.dayofweek >= 5).astype(int)
+    out["dayofweek"] = out.index.day_of_week
+    out["is_weekend"] = (out.index.day_of_week >= 5).astype(int)
     return out
 
 
